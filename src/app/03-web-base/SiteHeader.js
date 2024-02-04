@@ -1,13 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-
+import Spinner from '@/components/Spinner';
 import { getNavLinks } from '@/helpers/web-base-helpers';
 
 async function SiteHeader() {
-  let navLinks = await getNavLinks();
-
-  // Only show the first 4 links in the header.
-  navLinks = navLinks.slice(0, 4);
 
   return (
     <header className="site-header">
@@ -15,23 +11,35 @@ async function SiteHeader() {
         WebBase
       </Link>
       <nav>
-        <ol className="header-nav-links">
-          {navLinks.map(
-            ({ slug, label, href, type }) => (
-              <li key={slug}>
-                <Link
-                  href={href}
-                  className={`header-nav-link ${type}`}
-                >
-                  {label}
-                </Link>
-              </li>
-            )
-          )}
-        </ol>
+        <React.Suspense fallback={null}>
+          <NavLinks />
+        </React.Suspense>
       </nav>
     </header>
   );
+}
+
+async function NavLinks() {
+  let navLinks = await getNavLinks();
+
+  navLinks = navLinks.slice(0, 4);
+
+  return (
+    <ol className="header-nav-links">
+    {navLinks.map(
+      ({ slug, label, href, type }) => (
+        <li key={slug}>
+          <Link
+            href={href}
+            className={`header-nav-link ${type}`}
+          >
+            {label}
+          </Link>
+        </li>
+      )
+    )}
+   </ol>
+  )
 }
 
 export default SiteHeader;
